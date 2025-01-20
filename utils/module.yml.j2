@@ -3,6 +3,8 @@ name: hal_nordic
 build:
   cmake-ext: True
   kconfig-ext: True
+  sysbuild-cmake-ext: True
+  sysbuild-kconfig-ext: True
 blobs:
 {% for _ , blob in blobs.items() %}
     - path: {{ blob.path }}
