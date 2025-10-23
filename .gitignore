@@ -1,2 +1,4 @@
+*.pyc
+
 /drivers/nrf_wifi/doc_build
 /zephyr/blobs
