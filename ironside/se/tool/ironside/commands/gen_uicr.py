@@ -1117,16 +1117,15 @@ def extract_and_combine_periphconfs(
     combined_periphconf.sort(key=lambda e: e.regptr)
     deduplicated_periphconf = []
 
-    for regptr, regptr_entries in groupby(combined_periphconf, key=lambda e: e.regptr):
-        entries = list(regptr_entries)
-        if len(entries) > 1:
-            unique_values = {e.value for e in entries}
-            if len(unique_values) > 1:
-                raise ScriptError(
-                    f"PERIPHCONF has conflicting values for register 0x{regptr:09_x}: "
-                    + ", ".join([f"0x{val:09_x}" for val in unique_values])
-                )
-        deduplicated_periphconf.append(entries[0])
+    for _, regptr_entries in groupby(combined_periphconf, key=lambda e: e.regptr):
+        # We allow conflicts here so that we can report them as errors
+        # in a separate validation step.
+        unique_values = set()
+        for entry in regptr_entries:
+            if entry.value in unique_values:
+                continue
+            unique_values.add(entry.value)
+            deduplicated_periphconf.append(entry)
 
     final_periphconf = (PeriphconfEntry * len(deduplicated_periphconf))()
     for i, entry in enumerate(deduplicated_periphconf):
